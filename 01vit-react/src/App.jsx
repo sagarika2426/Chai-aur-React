@@ -1,12 +1,16 @@
 // import { useState } from 'react'
 // import './App.css'
+import Chai from "./chai"
 
 function App() {
+  const username = "Sagarika";
 
   return (
-    <div>
-      <h1>Hello</h1>
-    </div>
+    <>
+    <Chai/>
+    <h1>Enjoy Now, {username}!</h1>
+    {/* this username inside curly bracket called as evaluated expression */}
+    </>
    
   )
 }

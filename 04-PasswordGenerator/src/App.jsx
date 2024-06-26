@@ -1,140 +1,167 @@
-// import { useCallback, useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import { useState, useEffect, useRef} from 'react'
-import { useCallback } from 'react';
-import './App.css'
+import { useState, useEffect, useRef } from 'react';
+import './App.css';
 
 function App() {
+  // State hooks
+  const [length, setLength] = useState(12); // Default password length
+  const [uppercase, setUppercase] = useState(true); // Toggle for uppercase letters
+  const [lowercase, setLowercase] = useState(true); // Toggle for lowercase letters
+  const [numbers, setNumbers] = useState(true); // Toggle for including numbers
+  const [symbols, setSymbols] = useState(true); // Toggle for including symbols
+  const [password, setPassword] = useState(''); // Generated password state
+  const passwordRef = useRef(null); // Ref for password input
 
-  // Functionlities 
-  // set default length as anything you want to start with
-  const[length, setLength] = useState(6);
+  // Function to generate password
+  const passwordGenerator = () => {
+    let charSet = '';
+    let pass = '';
 
-  // by keeping numberAllowed and charAllowed false it means when you get a random password number and char wont be included in that
-  const[numAllowed, setNumAllowed] = useState(false);
-  const[charAllowed, setCharAllowed] = useState(false);
+    if (uppercase) charSet += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (lowercase) charSet += 'abcdefghijklmnopqrstuvwxyz';
+    if (numbers) charSet += '0123456789';
+    if (symbols) charSet += '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
-  // Keeping the default value as empty as we want to generate the password
-  const[password, setPassword] = useState("")
-
-  // useRef hook
-  const passwordRef = useRef(null);
-
-  
-  // useCallback Hook - keep in memory 
-  // as the password is changing when we change length, num and chars, these are the dependencies
-  const passwordGenerator = useCallback(() => {
-    let pass = "";
-    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    // from this string passowrd will get generated
-
-    if(numAllowed === true) {
-      str += "0123456789";
-    }
-    if(charAllowed === true){
-      str += "!@#$%^&*";
+    for (let i = 0; i < length; i++) {
+      let char = Math.floor(Math.random() * charSet.length);
+      pass += charSet.charAt(char);
     }
 
-    // How many times you have to loop the str? Same as length
-    // Get random chars from the str to get the password
-    for(var i = 1; i<=length; i++){
-      let char = Math.floor(Math.random()*str.length )
+    setPassword(pass);
+  };
 
-      pass += str.charAt(char)
-    }
-    setPassword(pass)
-
-
-  },[length, numAllowed, charAllowed])
-
-
-  // how to copy the password after clicking copy
-  const copyPasswordToClipboard = useCallback(() => {
+  // Function to copy password to clipboard
+  const copyPasswordToClipboard = () => {
     passwordRef.current?.select();
-    window.navigator.clipboard.writeText(password)
+    window.navigator.clipboard.writeText(password);
     alert('Your password has been copied to the clipboard!');
-  },[password])
+  };
 
-
+  // Effect to generate password whenever length or character options change
   useEffect(() => {
-    passwordGenerator()
-  }
-  ,[length, numAllowed, charAllowed, passwordGenerator])
+    passwordGenerator();
+  }, [length, uppercase, lowercase, numbers, symbols]);
 
+  // Inline styles for the background image
+  const bgImageStyle = {
+    backgroundImage: `url('https://uploads-ssl.webflow.com/61e737146fb07ee895b14516/61e737146fb07e7837b145e2_background-sign-in-tech-ui-kit-webflow-template.svg')`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    width: '100%',
+    minHeight: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+  };
 
-
+  // JSX for the UI
   return (
-    <>
-  <div className='flex border-b-2 m-auto text-center justify-center gap-2 mb-16 py-4 bg-slate-900'>
-    <h1 className='font-bold text-white text-3xl my-6'>Password Generator</h1>
-   
-    <div className='my-auto'>
-        <img src='https://e7.pngegg.com/pngimages/708/705/png-clipart-password-manager-password-safe-android-blue-electric-blue-thumbnail.png' className='rounded-full w-16' alt='Password Icon' />
-    </div>
-    
-</div>
-    
-    <div className='w-full max-w-xl mx-auto shadow-md bg-gray-800 py-10 px-10 rounded-md'>
-      <div className='flex shadow rounded-lg mb-4'>
-        <input
-        type='text'
-        value={password}
-        className='outline-none w-full py-1 px-3 rounded-lg text-orange-600 font-semibold'
-        placeholder='Password'
-        readOnly
-        ref={passwordRef}
-        // we want to highlight once we copy it this input that's why put the ref
-        />
-        <button className='bg-blue-600 text-white rounded-lg py-2 px-4 hover:bg-blue-700'
-        onClick={copyPasswordToClipboard}>
-          Copy
-        </button>
+    <div style={bgImageStyle}>
+      <div className="flex flex-col text-white lg:w-1/2">
+        {/* Heading */}
+        <header className="text-center mb-16 mt-5">
+          <h1 className="text-4xl font-bold">Password Generator</h1>
+          <p className="mt-2">Generate a personalized strong password</p>
+        </header>
 
+        {/* Container for the content */}
+        <div className="w-full flex flex-col lg:flex-row justify-center items-center">
+          {/* Password generator section */}
+          <div className="w-full p-8 bg-gray-900 rounded-lg shadow-md py-16">
+            {/* Password display and copy section */}
+            <div className="flex items-center mb-4">
+              {/* Password input field */}
+              <input
+                type="text"
+                value={password}
+                className="flex-1 py-2 px-3 rounded-l-lg text-gray-300 bg-gray-700 outline-none"
+                placeholder="Generated Password"
+                readOnly
+                ref={passwordRef}
+              />
+              {/* Copy button */}
+              <button
+                className="bg-blue-600 text-white rounded-r-lg py-2 px-4 ml-2 hover:bg-blue-700"
+                onClick={copyPasswordToClipboard}
+              >
+                Copy
+              </button>
+            </div>
+
+            {/* Settings section */}
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-4 text-xl justify-between">
+              {/* Password length slider */}
+              <div className="flex-1">
+                <label htmlFor="lengthRange" className="block mb-1 text-gray-400">
+                  Password Length: {length}
+                </label>
+                <input
+                  id="lengthRange"
+                  type="range"
+                  min={6}
+                  max={30}
+                  value={length}
+                  className="w-full"
+                  onChange={(e) => setLength(e.target.value)}
+                />
+              </div>
+
+              {/* Checkboxes for character options */}
+              <div className="flex flex-col text-xl">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="uppercaseCheckbox"
+                    checked={uppercase}
+                    onChange={() => setUppercase(!uppercase)}
+                  />
+                  <label htmlFor="uppercaseCheckbox" className="ml-2 text-gray-400">
+                    Uppercase
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="lowercaseCheckbox"
+                    checked={lowercase}
+                    onChange={() => setLowercase(!lowercase)}
+                  />
+                  <label htmlFor="lowercaseCheckbox" className="ml-2 text-gray-400">
+                    Lowercase
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="numbersCheckbox"
+                    checked={numbers}
+                    onChange={() => setNumbers(!numbers)}
+                  />
+                  <label htmlFor="numbersCheckbox" className="ml-2 text-gray-400">
+                    Numbers
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="symbolsCheckbox"
+                    checked={symbols}
+                    onChange={() => setSymbols(!symbols)}
+                  />
+                  <label htmlFor="symbolsCheckbox" className="ml-2 text-gray-400">
+                    Symbols
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="text-center text-gray-400 mt-auto mb-4">
+          <p>&copy; 2024 Password Generator by Sagarika Sahoo</p>
+        </footer>
       </div>
-{/* Range */}
-      <div className='text-white flex gap-10 m-auto text-lg '>
-        <div>
-          <input
-          type='range'
-          min={6}
-          max={30}
-          value={length}
-          className='cursor-pointer'
-          onChange={(e) => {setLength(e.target.value)}}/>
-          <label className='ml-2'>Length:{length}</label>
-        </div>
-{/* Number box */}
-        <div>
-          <input
-          type='checkbox'
-          defaultChecked={numAllowed}
-          onChange={() => {
-            setNumAllowed((prev) => !prev)
-          }}/>
-          <label className="ml-2">Numbers
-          </label>
-        </div>
-{/* char box */}
-        <div>
-          <input
-          type='checkbox'
-          defaultChecked={charAllowed}
-          onChange={() => {
-            setCharAllowed((prev) => !prev)
-          }}/>
-          <label className='ml-2'>Characters
-          </label>
-        </div>
-
-
-      </div>
     </div>
-
-    <p className='text-white text-center mt-96 '>@Sagarika Sahoo </p>
-
-    </>
-  )
+  );
 }
 
-export default App
+export default App;
